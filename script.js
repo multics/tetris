@@ -389,8 +389,6 @@ document.addEventListener('DOMContentLoaded', () => {
 
     function updateScore() {
         scoreElement.textContent = score
-
-        console.log('Score updated:', scoreElement.textContent)
     }
 
     function togglePause() {

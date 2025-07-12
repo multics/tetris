@@ -30,11 +30,6 @@ function updatePageContent(t) {
   if (heightLabel && t.heightLabel) heightLabel.textContent = t.heightLabel
   const startBtn = document.getElementById('start-button')
   if (startBtn && t.startButton) startBtn.textContent = t.startButton
-  const scoreP = document.querySelector('#game-area p')
-  if (scoreP && t.score) {
-    const scoreSpan = scoreP.querySelector('span')
-    scoreP.innerHTML = `${t.score} <span id="score">${scoreSpan ? scoreSpan.textContent : '0'}</span>`
-  }
   const controlsInfo = document.querySelector('.controls-info')
   if (controlsInfo && t.controlsInfo) controlsInfo.textContent = t.controlsInfo
 }
