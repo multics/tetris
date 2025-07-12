@@ -41,7 +41,7 @@ document.addEventListener('DOMContentLoaded', () => {
     ];
 
     let board;
-    let score;
+    let score = 0;
     let currentPiece;
     let gameLoop;
     let COLS, ROWS;
@@ -50,6 +50,8 @@ document.addEventListener('DOMContentLoaded', () => {
     let dropInterval = 1000; // ms
     let isPaused = false;
     let particles = [];
+    let isSpeedDrop = false
+    let dropIntervalBackup = dropInterval // Backup for speedy drop
 
     // --- Particle Class ---
     class Particle {
@@ -293,15 +295,19 @@ document.addEventListener('DOMContentLoaded', () => {
             spawnPiece();
         }
         dropCounter = 0;
+        score += 1 // Increment score for each piece moved down
+        updateScore();
     }
 
     function hardDrop() {
         while (!checkCollision(currentPiece)) {
             currentPiece.y++;
+            score += 1
         }
         currentPiece.y--;
         lockPiece();
         spawnPiece();
+        updateScore();
     }
 
     function movePieceLeft() {
@@ -382,7 +388,9 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     function updateScore() {
-        scoreElement.textContent = score;
+        scoreElement.textContent = score
+
+        console.log('Score updated:', scoreElement.textContent)
     }
 
     function togglePause() {
@@ -403,48 +411,48 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     // --- Prevent text selection on mobile and desktop ---
-    document.body.style.userSelect = 'none'
-    document.body.style.webkitUserSelect = 'none'
-    document.body.style.msUserSelect = 'none'
-    document.body.style.mozUserSelect = 'none'
+    // document.body.style.userSelect = 'none'
+    // document.body.style.webkitUserSelect = 'none'
+    // document.body.style.msUserSelect = 'none'
+    // document.body.style.mozUserSelect = 'none'
 
-    // --- Mobile: Long press down for speedy drop ---
-    let dropIntervalId = null
-    let dropActive = false
-    downBtn.addEventListener('touchstart', function(e) {
-        e.preventDefault() // 阻止长按弹出菜单
-        if (isPaused || !currentPiece) return
-        dropActive = true
-        // Start speedy drop (3x) after 300ms hold
-        dropIntervalId = setTimeout(function() {
-            if (dropActive && !isSpeedDrop) {
-                isSpeedDrop = true
-                dropIntervalBackup = dropInterval
-                dropInterval = Math.max(50, dropInterval / 3)
-            }
-        }, 300)
-    }, { passive: false })
-    // 触摸松开时恢复正常速度
-    downBtn.addEventListener('touchend', function(e) {
-        e.preventDefault();
-        dropActive = false
-        clearTimeout(dropIntervalId)
-        if (isSpeedDrop) {
-            dropInterval = dropIntervalBackup
-            isSpeedDrop = false
-        }
-    }, { passive: false });
-    downBtn.addEventListener('touchcancel', function(e) {
-        e.preventDefault();
-        dropActive = false
-        clearTimeout(dropIntervalId)
-        if (isSpeedDrop) {
-            dropInterval = dropIntervalBackup
-            isSpeedDrop = false
-        }
-    }, { passive: false })
-    // 禁止下按钮的上下文菜单
-    downBtn.addEventListener('contextmenu', function(e) { e.preventDefault() });
+    // // --- Mobile: Long press down for speedy drop ---
+    // let dropIntervalId = null
+    // let dropActive = false
+    // downBtn.addEventListener('touchstart', function(e) {
+    //     e.preventDefault() // 阻止长按弹出菜单
+    //     if (isPaused || !currentPiece) return
+    //     dropActive = true
+    //     // Start speedy drop (3x) after 300ms hold
+    //     dropIntervalId = setTimeout(function() {
+    //         if (dropActive && !isSpeedDrop) {
+    //             isSpeedDrop = true
+    //             dropIntervalBackup = dropInterval
+    //             dropInterval = Math.max(50, dropInterval / 3)
+    //         }
+    //     }, 300)
+    // }, { passive: false })
+    // // 触摸松开时恢复正常速度
+    // downBtn.addEventListener('touchend', function(e) {
+    //     e.preventDefault();
+    //     dropActive = false
+    //     clearTimeout(dropIntervalId)
+    //     if (isSpeedDrop) {
+    //         dropInterval = dropIntervalBackup
+    //         isSpeedDrop = false
+    //     }
+    // }, { passive: false });
+    // downBtn.addEventListener('touchcancel', function(e) {
+    //     e.preventDefault();
+    //     dropActive = false
+    //     clearTimeout(dropIntervalId)
+    //     if (isSpeedDrop) {
+    //         dropInterval = dropIntervalBackup
+    //         isSpeedDrop = false
+    //     }
+    // }, { passive: false })
+    // // 禁止下按钮的上下文菜单
+    // downBtn.addEventListener('contextmenu', function(e) { e.preventDefault() });
 
     speedDropBtn.addEventListener('pointerdown', function(e) {
         if (isPaused || !currentPiece) return
@@ -482,12 +490,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 rotatePiece();
                 break;
             case ' ': // Space bar
-                event.preventDefault();
-                if (!isSpeedDrop) {
-                    isSpeedDrop = true
-                    dropIntervalBackup = dropInterval
-                    dropInterval = Math.max(50, dropInterval / 3)
-                }
+                hardDrop();
                 break;
         }
     });

@@ -10,8 +10,6 @@
 
 <body>
     <div class="game-container">
-        <h1>Tetris</h1>
-
         <div id="settings" class="settings-container">
             <div class="input-group">
                 <label for="width-input">Width (5-30):</label>
@@ -26,16 +24,18 @@
         </div>
 
         <div id="game-area" class="hidden">
-            <p>Score: <span id="score">0</span></p>
+            <p>Score:
+            <div style="display: inline-block;" id="score">110</div>
+            </p>
             <canvas id="tetris-canvas"></canvas>
 
             <div id="mobile-controls" class="mobile-controls-container">
                 <button id="left-btn">◀</button>
-                <button id="rotate-btn">↺</button>
+                <button id="rotate-btn">▲</button>
                 <button id="right-btn">▶</button>
+                <button id="speed-drop-btn">⍗</button>
                 <button id="down-btn">▼</button>
-                <button id="speed-drop-btn">S</button>
-                <button id="pause-btn">P</button>
+                <button id="pause-btn">☕︎</button>
             </div>
         </div>
         <p class="controls-info">Controls: Arrows (Move/Rotate) | Space (Speedy Drop) | S (Pause)</p>
