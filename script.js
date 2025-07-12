@@ -451,6 +451,7 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     function gameOver() {
+        updateScore()
         if (gameAreaDiv.classList.contains('hidden')) return // 防止多次触发
         cancelAnimationFrame(gameLoop)
         alert(`Game Over! Your score: ${score}`)
