@@ -192,6 +192,37 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     }
 
+    // 立体方块绘制函数
+    function draw3DBlock(ctx, x, y, size, color) {
+        // 主色
+        ctx.fillStyle = color
+        ctx.fillRect(x, y, size, size)
+
+        // 渐变高光
+        let grad = ctx.createLinearGradient(x, y, x + size, y + size)
+        grad.addColorStop(0, 'rgba(255,255,255,0.7)')
+        grad.addColorStop(0.3, color)
+        grad.addColorStop(1, 'rgba(0,0,0,0.5)')
+        ctx.fillStyle = grad
+        ctx.fillRect(x, y, size, size)
+
+        // 左上高光
+        ctx.strokeStyle = 'rgba(255,255,255,0.8)'
+        ctx.beginPath()
+        ctx.moveTo(x, y + size)
+        ctx.lineTo(x, y)
+        ctx.lineTo(x + size, y)
+        ctx.stroke()
+
+        // 右下阴影
+        ctx.strokeStyle = 'rgba(0,0,0,0.5)'
+        ctx.beginPath()
+        ctx.moveTo(x + size, y)
+        ctx.lineTo(x + size, y + size)
+        ctx.lineTo(x, y + size)
+        ctx.stroke()
+    }
+
     function drawGrid() {
         context.strokeStyle = 'rgba(255, 255, 255, 0.1)';
         context.lineWidth = 1;
@@ -213,14 +244,32 @@ document.addEventListener('DOMContentLoaded', () => {
         board.forEach((row, y) => {
             row.forEach((value, x) => {
                 if (value > 0) {
-                    context.fillStyle = COLORS[value];
-                    context.fillRect(x * BLOCK_SIZE, y * BLOCK_SIZE, BLOCK_SIZE, BLOCK_SIZE);
+                    draw3DBlock(context, x * BLOCK_SIZE, y * BLOCK_SIZE, BLOCK_SIZE, COLORS[value]);
                 }
             });
         });
     }
 
     function drawPiece(piece) {
+        piece.shape.forEach((row, y) => {
+            row.forEach((value, x) => {
+                if (value) {
+                    draw3DBlock(
+                        context,
+                        (piece.x + x) * BLOCK_SIZE,
+                        (piece.y + y) * BLOCK_SIZE,
+                        BLOCK_SIZE,
+                        piece.color
+                    )
+                }
+            })
+        })
+    }
+
+    // 新增：平面风格绘制函数，专用于 ghost
+    function drawFlatPiece(piece) {
+        context.save()
+        context.globalAlpha = 0.25;
         context.fillStyle = piece.color;
         piece.shape.forEach((row, y) => {
             row.forEach((value, x) => {
@@ -234,18 +283,19 @@ document.addEventListener('DOMContentLoaded', () => {
                 }
             });
         });
+        context.restore();
     }
 
     function drawGhostPiece(piece) {
         const ghost = JSON.parse(JSON.stringify(piece)); // Deep clone
-        ghost.color = 'rgba(255, 255, 255, 0.1)';
+        ghost.color = 'rgba(255, 255, 255, 0.4)';
 
         while (!checkCollision(ghost)) {
             ghost.y++;
         }
         ghost.y--; // Move back to the last valid position
 
-        drawPiece(ghost);
+        drawFlatPiece(ghost);
     }
 
     function drawPauseScreen() {
