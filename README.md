@@ -9,7 +9,7 @@ This project was created with the help of Gemini.
 - **Customizable Board:** Set your own width and height for the game board.
 - **Responsive Design:** Playable on both desktop and mobile devices.
 - **Modern Controls:**
-  - **Hard Drop (Spacebar):** Instantly drop the piece to the bottom.
+  - **Speedy Drop (Spacebar):** Speedy drop the piece to the bottom.
   - **Pause (S key):** Pause and resume the game.
 - **Ghost Piece:** Shows a projection of where the current piece will land.
 - **Touch Controls:** On-screen buttons for mobile play.

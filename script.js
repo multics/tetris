@@ -399,6 +399,59 @@ document.addEventListener('DOMContentLoaded', () => {
         settingsDiv.classList.remove('hidden');
     }
 
+    // --- Prevent text selection on mobile and desktop ---
+    document.body.style.userSelect = 'none'
+    document.body.style.webkitUserSelect = 'none'
+    document.body.style.msUserSelect = 'none'
+    document.body.style.mozUserSelect = 'none'
+
+    // --- Mobile: Pause/Resume by tapping game area ---
+    let lastTap = 0
+    canvas.addEventListener('touchend', function(e) {
+        // Only trigger if visible (mobile mode)
+        if (window.innerWidth <= 768 && !gameAreaDiv.classList.contains('hidden')) {
+            // Prevent accidental double tap
+            const now = Date.now()
+            if (now - lastTap > 300) {
+                togglePause()
+            }
+            lastTap = now
+        }
+    })
+
+    // --- Mobile: Long press down for speedy drop ---
+    let dropIntervalId = null
+    let dropActive = false
+    downBtn.addEventListener('touchstart', function(e) {
+        if (isPaused || !currentPiece) return
+        dropActive = true
+        // Start speedy drop (3x) after 300ms hold
+        dropIntervalId = setTimeout(function() {
+            if (dropActive && !isSpeedDrop) {
+                isSpeedDrop = true
+                dropIntervalBackup = dropInterval
+                dropInterval = Math.max(50, dropInterval / 3)
+            }
+        }, 300)
+    })
+    // 触摸松开时恢复正常速度
+    downBtn.addEventListener('touchend', function(e) {
+        dropActive = false
+        clearTimeout(dropIntervalId)
+        if (isSpeedDrop) {
+            dropInterval = dropIntervalBackup
+            isSpeedDrop = false
+        }
+    });
+    downBtn.addEventListener('touchcancel', function(e) {
+        dropActive = false
+        clearTimeout(dropIntervalId)
+        if (isSpeedDrop) {
+            dropInterval = dropIntervalBackup
+            isSpeedDrop = false
+        }
+    });
+
     // --- Event Listeners ---
     startButton.addEventListener('click', startGame);
 
@@ -426,8 +479,22 @@ document.addEventListener('DOMContentLoaded', () => {
                 break;
             case ' ': // Space bar
                 event.preventDefault();
-                hardDrop();
+                if (!isSpeedDrop) {
+                    isSpeedDrop = true
+                    dropIntervalBackup = dropInterval
+                    dropInterval = Math.max(50, dropInterval / 3)
+                }
                 break;
+        }
+    });
+
+    // 恢复正常下落速度
+    document.addEventListener('keyup', event => {
+        if (event.key === ' ') {
+            if (isSpeedDrop) {
+                dropInterval = dropIntervalBackup
+                isSpeedDrop = false
+            }
         }
     });
 
