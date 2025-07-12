@@ -135,7 +135,7 @@ document.addEventListener('DOMContentLoaded', () => {
         ROWS = userHeight;
         canvas.width = COLS * BLOCK_SIZE;
         canvas.height = ROWS * BLOCK_SIZE;
-        
+
         return true;
     }
 
@@ -378,7 +378,7 @@ document.addEventListener('DOMContentLoaded', () => {
             updateScore();
         }
     }
-    
+
     function updateScore() {
         scoreElement.textContent = score;
     }

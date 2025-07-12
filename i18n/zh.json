@@ -1,0 +1,8 @@
+{
+  "title": "俄罗斯方块",
+  "widthLabel": "宽度 (5-30):",
+  "heightLabel": "高度 (10-40):",
+  "startButton": "开始游戏",
+  "score": "得分:",
+  "controlsInfo": "控制: 方向键 (移动/旋转) | 空格键 (快速下落) | S (暂停)"
+}

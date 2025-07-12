@@ -9,11 +9,11 @@
 <body>
     <div class="game-container">
         <h1>Tetris</h1>
-        
+
         <div id="settings" class="settings-container">
             <div class="input-group">
                 <label for="width-input">Width (5-30):</label>
-                <input type="number" id="width-input" value="10" min="5" max="30">
+                <input type="number" id="width-input" value="12" min="5" max="30">
             </div>
             <div class="input-group">
                 <label for="height-input">Height (10-40):</label>
@@ -33,9 +33,10 @@
             <button id="right-btn">▶</button>
             <button id="down-btn">▼</button>
         </div>
-         <p class="controls-info">Controls: Arrows (Move/Rotate) | Space (Hard Drop) | S (Pause)</p>
+        <p class="controls-info">Controls: Arrows (Move/Rotate) | Space (Speedy Drop) | S (Pause)</p>
     </div>
 
+    <script src="i18n.js"></script>
     <script src="script.js"></script>
 </body>
 </html>

@@ -1,0 +1,8 @@
+{
+  "title": "Tetris",
+  "widthLabel": "Width (5-30):",
+  "heightLabel": "Height (10-40):",
+  "startButton": "Start Game",
+  "score": "Score:",
+  "controlsInfo": "Controls: Arrows (Move/Rotate) | Space (Speedy Drop) | S (Pause)"
+}
