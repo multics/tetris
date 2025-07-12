@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Web Tetris</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <div class="game-container">
+        <h1>Tetris</h1>
+        
+        <div id="settings" class="settings-container">
+            <div class="input-group">
+                <label for="width-input">Width (5-30):</label>
+                <input type="number" id="width-input" value="10" min="5" max="30">
+            </div>
+            <div class="input-group">
+                <label for="height-input">Height (10-40):</label>
+                <input type="number" id="height-input" value="20" min="10" max="40">
+            </div>
+            <button id="start-button">Start Game</button>
+        </div>
+
+        <div id="game-area" class="hidden">
+            <p>Score: <span id="score">0</span></p>
+            <canvas id="tetris-canvas"></canvas>
+        </div>
+
+        <div id="mobile-controls" class="mobile-controls-container">
+            <button id="left-btn">◀</button>
+            <button id="rotate-btn">↺</button>
+            <button id="right-btn">▶</button>
+            <button id="down-btn">▼</button>
+        </div>
+         <p class="controls-info">Use Arrow Keys to Move & Rotate</p>
+    </div>
+
+    <script src="script.js"></script>
+</body>
+</html>
