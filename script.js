@@ -407,18 +407,21 @@ document.addEventListener('DOMContentLoaded', () => {
     document.body.style.mozUserSelect = 'none'
 
     // --- Mobile: Pause/Resume by tapping game area ---
-    let lastTap = 0
-    canvas.addEventListener('touchend', function(e) {
-        // Only trigger if visible (mobile mode)
-        if (window.innerWidth <= 768 && !gameAreaDiv.classList.contains('hidden')) {
-            // Prevent accidental double tap
-            const now = Date.now()
-            if (now - lastTap > 300) {
-                togglePause()
-            }
-            lastTap = now
+    // 兼容所有点击（tap），不只 touchend
+    function isMobile() {
+        return window.innerWidth <= 768 || /mobile|android|iphone|ipad|ipod/i.test(navigator.userAgent)
+    }
+    function isGameActive() {
+        return !gameAreaDiv.classList.contains('hidden')
+    }
+    function handleGameAreaPauseToggle(e) {
+        if (isMobile() && isGameActive()) {
+            e.preventDefault()
+            togglePause()
         }
-    })
+    }
+    canvas.addEventListener('touchend', handleGameAreaPauseToggle, { passive: false })
+    canvas.addEventListener('click', handleGameAreaPauseToggle, { passive: false });
 
     // --- Mobile: Long press down for speedy drop ---
     let dropIntervalId = null
