@@ -93,6 +93,7 @@ canvas {
     margin: 0 10px;
     background-color: #373737;
     color: #e0e0e0;
+    display: none;
 }
 
 .controls-info {

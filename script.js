@@ -15,6 +15,8 @@ document.addEventListener('DOMContentLoaded', () => {
     const rightBtn = document.getElementById('right-btn');
     const rotateBtn = document.getElementById('rotate-btn');
     const downBtn = document.getElementById('down-btn');
+    const speedDropBtn = document.getElementById('speed-drop-btn')
+    const pauseBtn = document.getElementById('pause-btn');
 
     // --- Game Constants & Variables ---
     let BLOCK_SIZE = 20; // Will be adjusted based on screen size
@@ -406,23 +408,6 @@ document.addEventListener('DOMContentLoaded', () => {
     document.body.style.msUserSelect = 'none'
     document.body.style.mozUserSelect = 'none'
 
-    // --- Mobile: Pause/Resume by tapping game area ---
-    // 兼容所有点击（tap），不只 touchend
-    function isMobile() {
-        return window.innerWidth <= 768 || /mobile|android|iphone|ipad|ipod/i.test(navigator.userAgent)
-    }
-    function isGameActive() {
-        return !gameAreaDiv.classList.contains('hidden')
-    }
-    function handleGameAreaPauseToggle(e) {
-        if (isMobile() && isGameActive()) {
-            e.preventDefault()
-            togglePause()
-        }
-    }
-    canvas.addEventListener('touchend', handleGameAreaPauseToggle, { passive: false })
-    canvas.addEventListener('click', handleGameAreaPauseToggle, { passive: false });
-
     // --- Mobile: Long press down for speedy drop ---
     let dropIntervalId = null
     let dropActive = false
@@ -462,7 +447,9 @@ document.addEventListener('DOMContentLoaded', () => {
     downBtn.addEventListener('contextmenu', function(e) { e.preventDefault() });
 
     // --- Event Listeners ---
-    startButton.addEventListener('click', startGame);
+    startButton.addEventListener('click', () => {
+        startGame()
+    });
 
     document.addEventListener('keydown', event => {
         if (event.key === 's' || event.key === 'S') {
@@ -511,5 +498,17 @@ document.addEventListener('DOMContentLoaded', () => {
     leftBtn.addEventListener('click', () => { if (!isPaused && currentPiece) movePieceLeft(); });
     rightBtn.addEventListener('click', () => { if (!isPaused && currentPiece) movePieceRight(); });
     downBtn.addEventListener('click', () => { if (!isPaused && currentPiece) movePieceDown(); });
-    rotateBtn.addEventListener('click', () => { if (!isPaused && currentPiece) rotatePiece(); });
+    rotateBtn.addEventListener('click', () => { if (!isPaused && currentPiece) rotatePiece() })
+    speedDropBtn.addEventListener('click', function(e) {
+        if (isPaused || !currentPiece) return
+        if (!isSpeedDrop) {
+            isSpeedDrop = true
+            dropIntervalBackup = dropInterval
+            dropInterval = Math.max(50, dropInterval / 3)
+        }
+    })
+    pauseBtn.addEventListener('click', function(e) {
+        togglePause()
+    })
+
 });
