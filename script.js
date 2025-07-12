@@ -424,6 +424,7 @@ document.addEventListener('DOMContentLoaded', () => {
     let dropIntervalId = null
     let dropActive = false
     downBtn.addEventListener('touchstart', function(e) {
+        e.preventDefault() // 阻止长按弹出菜单
         if (isPaused || !currentPiece) return
         dropActive = true
         // Start speedy drop (3x) after 300ms hold
@@ -434,24 +435,28 @@ document.addEventListener('DOMContentLoaded', () => {
                 dropInterval = Math.max(50, dropInterval / 3)
             }
         }, 300)
-    })
+    }, { passive: false })
     // 触摸松开时恢复正常速度
     downBtn.addEventListener('touchend', function(e) {
+        e.preventDefault();
         dropActive = false
         clearTimeout(dropIntervalId)
         if (isSpeedDrop) {
             dropInterval = dropIntervalBackup
             isSpeedDrop = false
         }
-    });
+    }, { passive: false });
     downBtn.addEventListener('touchcancel', function(e) {
+        e.preventDefault();
         dropActive = false
         clearTimeout(dropIntervalId)
         if (isSpeedDrop) {
             dropInterval = dropIntervalBackup
             isSpeedDrop = false
         }
-    });
+    }, { passive: false })
+    // 禁止下按钮的上下文菜单
+    downBtn.addEventListener('contextmenu', function(e) { e.preventDefault() });
 
     // --- Event Listeners ---
     startButton.addEventListener('click', startGame);
