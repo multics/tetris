@@ -501,11 +501,7 @@ document.addEventListener('DOMContentLoaded', () => {
     rotateBtn.addEventListener('click', () => { if (!isPaused && currentPiece) rotatePiece() })
     speedDropBtn.addEventListener('click', function(e) {
         if (isPaused || !currentPiece) return
-        if (!isSpeedDrop) {
-            isSpeedDrop = true
-            dropIntervalBackup = dropInterval
-            dropInterval = Math.max(50, dropInterval / 3)
-        }
+        hardDrop()
     })
     pauseBtn.addEventListener('click', function(e) {
         togglePause()

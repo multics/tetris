@@ -1,11 +1,13 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Web Tetris</title>
     <link rel="stylesheet" href="style.css">
 </head>
+
 <body>
     <div class="game-container">
         <h1>Tetris</h1>
@@ -26,15 +28,15 @@
         <div id="game-area" class="hidden">
             <p>Score: <span id="score">0</span></p>
             <canvas id="tetris-canvas"></canvas>
-        </div>
 
-        <div id="mobile-controls" class="mobile-controls-container">
-            <button id="left-btn">◀</button>
-            <button id="rotate-btn">↺</button>
-            <button id="right-btn">▶</button>
-            <button id="down-btn">▼</button>
-            <button id="speed-drop-btn">⏬</button>
-            <button id="pause-btn">⏸</button>
+            <div id="mobile-controls" class="mobile-controls-container">
+                <button id="left-btn">◀</button>
+                <button id="rotate-btn">↺</button>
+                <button id="right-btn">▶</button>
+                <button id="down-btn">▼</button>
+                <button id="speed-drop-btn">⏬</button>
+                <button id="pause-btn">⏸</button>
+            </div>
         </div>
         <p class="controls-info">Controls: Arrows (Move/Rotate) | Space (Speedy Drop) | S (Pause)</p>
     </div>
@@ -42,4 +44,5 @@
     <script src="i18n.js"></script>
     <script src="script.js"></script>
 </body>
+
 </html>
