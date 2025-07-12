@@ -238,7 +238,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
     function drawGhostPiece(piece) {
         const ghost = JSON.parse(JSON.stringify(piece)); // Deep clone
-        ghost.color = 'rgba(255, 255, 255, 0.2)';
+        ghost.color = 'rgba(255, 255, 255, 0.1)';
 
         while (!checkCollision(ghost)) {
             ghost.y++;
