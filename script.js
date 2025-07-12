@@ -1,4 +1,3 @@
-
 // Wait for the DOM to be fully loaded before running the script
 document.addEventListener('DOMContentLoaded', () => {
     // --- DOM Elements ---
@@ -48,6 +47,38 @@ document.addEventListener('DOMContentLoaded', () => {
     let dropCounter = 0;
     let dropInterval = 1000; // ms
     let isPaused = false;
+    let particles = [];
+
+    // --- Particle Class ---
+    class Particle {
+        constructor(x, y, color) {
+            this.x = x;
+            this.y = y;
+            this.color = color;
+            this.size = Math.random() * (BLOCK_SIZE / 6) + 1;
+            this.life = 1; // 1 = 100%
+            this.vx = (Math.random() - 0.5) * 4; // Horizontal velocity
+            this.vy = (Math.random() - 0.5) * 4; // Vertical velocity
+            this.gravity = 0.1;
+        }
+
+        update() {
+            this.x += this.vx;
+            this.y += this.vy;
+            this.vy += this.gravity;
+            this.life -= 0.02;
+        }
+
+        draw(ctx) {
+            ctx.save();
+            ctx.globalAlpha = this.life;
+            ctx.fillStyle = this.color;
+            ctx.beginPath();
+            ctx.arc(this.x, this.y, this.size, 0, Math.PI * 2);
+            ctx.fill();
+            ctx.restore();
+        }
+    }
 
     // --- Piece Class ---
     class Piece {
@@ -68,6 +99,7 @@ document.addEventListener('DOMContentLoaded', () => {
         updateScore();
         spawnPiece();
         isPaused = false;
+        particles = [];
 
         if (gameLoop) cancelAnimationFrame(gameLoop);
         lastTime = 0;
@@ -136,6 +168,7 @@ document.addEventListener('DOMContentLoaded', () => {
             movePieceDown();
         }
 
+        handleParticles();
         draw();
         gameLoop = requestAnimationFrame(update);
     }
@@ -145,6 +178,7 @@ document.addEventListener('DOMContentLoaded', () => {
         context.clearRect(0, 0, canvas.width, canvas.height);
         drawGrid();
         drawBoard();
+        drawParticles();
         if (currentPiece) {
             drawGhostPiece(currentPiece);
             drawPiece(currentPiece);
@@ -218,6 +252,34 @@ document.addEventListener('DOMContentLoaded', () => {
         context.textAlign = 'center';
         context.textBaseline = 'middle';
         context.fillText('Paused', canvas.width / 2, canvas.height / 2);
+    }
+
+    function drawParticles() {
+        particles.forEach(p => p.draw(context));
+    }
+
+    // --- Particle Management ---
+    function handleParticles() {
+        for (let i = particles.length - 1; i >= 0; i--) {
+            particles[i].update();
+            if (particles[i].life <= 0) {
+                particles.splice(i, 1);
+            }
+        }
+    }
+
+    function createLineClearEffect(y, row) {
+        for (let x = 0; x < COLS; x++) {
+            const colorIndex = row[x] || 1;
+            const color = COLORS[colorIndex];
+            for (let i = 0; i < 10; i++) { // 10 particles per block
+                particles.push(new Particle(
+                    (x + 0.5) * BLOCK_SIZE,
+                    (y + 0.5) * BLOCK_SIZE,
+                    color
+                ));
+            }
+        }
     }
 
     // --- Movement & Collision ---
@@ -302,15 +364,14 @@ document.addEventListener('DOMContentLoaded', () => {
     function clearLines() {
         let linesCleared = 0;
         outer: for (let y = ROWS - 1; y >= 0; y--) {
-            for (let x = 0; x < COLS; x++) {
-                if (board[y][x] === 0) {
-                    continue outer;
-                }
+            if (board[y].every(value => value > 0)) {
+                linesCleared++;
+                const clearedRow = board.splice(y, 1)[0];
+                createLineClearEffect(y, clearedRow);
+                const newRow = Array(COLS).fill(0);
+                board.unshift(newRow);
+                y++;
             }
-            const row = board.splice(y, 1)[0].fill(0);
-            board.unshift(row);
-            y++;
-            linesCleared++;
         }
         if (linesCleared > 0) {
             score += linesCleared * 10 * linesCleared;
@@ -325,10 +386,8 @@ document.addEventListener('DOMContentLoaded', () => {
     function togglePause() {
         isPaused = !isPaused;
         if (!isPaused) {
-            // If unpausing, restart the loop
             gameLoop = requestAnimationFrame(update);
         } else {
-            // If pausing, draw the pause screen immediately
             draw();
         }
     }
@@ -344,15 +403,13 @@ document.addEventListener('DOMContentLoaded', () => {
     startButton.addEventListener('click', startGame);
 
     document.addEventListener('keydown', event => {
-        if (!currentPiece) return;
-
-        // Allow pause/unpause even if game is over, but not other controls
         if (event.key === 's' || event.key === 'S') {
+            if(gameAreaDiv.classList.contains('hidden')) return;
             togglePause();
             return;
         }
 
-        if (isPaused) return; // Don't handle other keys if paused
+        if (isPaused || !currentPiece) return;
 
         switch (event.key) {
             case 'ArrowLeft':
@@ -368,15 +425,15 @@ document.addEventListener('DOMContentLoaded', () => {
                 rotatePiece();
                 break;
             case ' ': // Space bar
-                event.preventDefault(); // Prevent page from scrolling
+                event.preventDefault();
                 hardDrop();
                 break;
         }
     });
 
     // Mobile button listeners
-    leftBtn.addEventListener('click', () => { if (!isPaused) movePieceLeft(); });
-    rightBtn.addEventListener('click', () => { if (!isPaused) movePieceRight(); });
-    downBtn.addEventListener('click', () => { if (!isPaused) movePieceDown(); });
-    rotateBtn.addEventListener('click', () => { if (!isPaused) rotatePiece(); });
+    leftBtn.addEventListener('click', () => { if (!isPaused && currentPiece) movePieceLeft(); });
+    rightBtn.addEventListener('click', () => { if (!isPaused && currentPiece) movePieceRight(); });
+    downBtn.addEventListener('click', () => { if (!isPaused && currentPiece) movePieceDown(); });
+    rotateBtn.addEventListener('click', () => { if (!isPaused && currentPiece) rotatePiece(); });
 });
