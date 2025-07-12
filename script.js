@@ -446,6 +446,14 @@ document.addEventListener('DOMContentLoaded', () => {
     // 禁止下按钮的上下文菜单
     downBtn.addEventListener('contextmenu', function(e) { e.preventDefault() });
 
+    speedDropBtn.addEventListener('pointerdown', function(e) {
+        if (isPaused || !currentPiece) return
+        hardDrop()
+    })
+    pauseBtn.addEventListener('pointerdown', function(e) {
+        togglePause()
+    })
+
     // --- Event Listeners ---
     startButton.addEventListener('click', () => {
         startGame()
@@ -495,16 +503,10 @@ document.addEventListener('DOMContentLoaded', () => {
     });
 
     // Mobile button listeners
-    leftBtn.addEventListener('click', () => { if (!isPaused && currentPiece) movePieceLeft(); });
-    rightBtn.addEventListener('click', () => { if (!isPaused && currentPiece) movePieceRight(); });
-    downBtn.addEventListener('click', () => { if (!isPaused && currentPiece) movePieceDown(); });
+    leftBtn.addEventListener('click', () => { if (!isPaused && currentPiece) movePieceLeft() })
+    rightBtn.addEventListener('click', () => { if (!isPaused && currentPiece) movePieceRight() })
+    downBtn.addEventListener('click', () => { if (!isPaused && currentPiece) movePieceDown() })
     rotateBtn.addEventListener('click', () => { if (!isPaused && currentPiece) rotatePiece() })
-    speedDropBtn.addEventListener('click', function(e) {
-        if (isPaused || !currentPiece) return
-        hardDrop()
-    })
-    pauseBtn.addEventListener('click', function(e) {
-        togglePause()
-    })
-
+    // speedDropBtn.addEventListener('click', function(e) { if (!isPaused && currentPiece) hardDrop() })
+    // pauseBtn.addEventListener('click', function(e) { togglePause() })
 });
