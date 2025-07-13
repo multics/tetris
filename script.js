@@ -72,6 +72,7 @@ document.addEventListener('DOMContentLoaded', () => {
             },
             COLS,
             ROWS,
+            isPaused,
             isGameOver // 新增
         }
         localStorage.setItem(STORAGE_KEY, JSON.stringify(state))
@@ -87,6 +88,7 @@ document.addEventListener('DOMContentLoaded', () => {
             ROWS = state.ROWS
             board = state.board
             score = state.score
+            isPaused = !!state.isPaused
             isGameOver = !!state.isGameOver // 新增
             // 恢复currentPiece
             const shape = SHAPES[state.currentPiece.shapeIndex]
@@ -161,13 +163,13 @@ document.addEventListener('DOMContentLoaded', () => {
         if (!loadGameState()) {
             board = createBoard(COLS, ROWS)
             score = 0
-            spawnPiece();
+            spawnPiece()
         }
         updateScore()
         draw()
         gameLoop = requestAnimationFrame(update)
         settingsDiv.classList.add('hidden')
-        gameAreaDiv.classList.remove('hidden');
+        gameAreaDiv.classList.remove('hidden')
     }
 
     function setDimensions() {
@@ -363,6 +365,7 @@ document.addEventListener('DOMContentLoaded', () => {
         context.textAlign = 'center'
         context.textBaseline = 'middle'
         context.fillText('Paused', canvas.width / 2, canvas.height / 2)
+        saveGameState()
     }
 
     function drawParticles() {
