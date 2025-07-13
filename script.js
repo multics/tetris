@@ -40,6 +40,10 @@ document.addEventListener('DOMContentLoaded', () => {
         '#3877FF'   // L - Indigo
     ]
 
+    // --- LocalStorage Keys ---
+    const STORAGE_KEY = 'tetris_save_v1'
+
+    // --- Game State ---
     let board
     let score = 0
     let currentPiece
@@ -52,6 +56,58 @@ document.addEventListener('DOMContentLoaded', () => {
     let particles = []
     let isSpeedDrop = false
     let dropIntervalBackup = dropInterval // Backup for speedy drop
+
+    // --- Save/Load State ---
+    function saveGameState() {
+        if (!board || !currentPiece) return
+        const state = {
+            board,
+            score,
+            currentPiece: {
+                shapeIndex: getShapeIndex(currentPiece.shape),
+                x: currentPiece.x,
+                y: currentPiece.y,
+                color: currentPiece.color
+            },
+            COLS,
+            ROWS
+        }
+        localStorage.setItem('tetris_save_v1', JSON.stringify(state))
+    }
+
+    function loadGameState() {
+        const data = localStorage.getItem('tetris_save_v1')
+        if (!data) return false
+        try {
+            const state = JSON.parse(data)
+            if (!state.board || !state.currentPiece) return false
+            COLS = state.COLS
+            ROWS = state.ROWS
+            board = state.board
+            score = state.score
+            // 恢复currentPiece
+            const shape = SHAPES[state.currentPiece.shapeIndex]
+            const color = state.currentPiece.color
+            currentPiece = new Piece(shape, color)
+            currentPiece.x = state.currentPiece.x
+            currentPiece.y = state.currentPiece.y
+            updateScore()
+            return true
+        } catch {
+            return false
+        }
+    }
+
+    function clearGameState() {
+        localStorage.removeItem('tetris_save_v1')
+    }
+
+    function getShapeIndex(shape) {
+        for (let i = 0; i < SHAPES.length; i++) {
+            if (JSON.stringify(SHAPES[i]) === JSON.stringify(shape)) return i
+        }
+        return 0
+    }
 
     // --- Particle Class ---
     class Particle {
@@ -98,12 +154,14 @@ document.addEventListener('DOMContentLoaded', () => {
     function startGame() {
         if (!setDimensions()) return
 
-        board = createBoard(COLS, ROWS)
-        score = 0
+        // 检查是否有存档，有则恢复
+        if (loadGameState()) {
+        } else {
+            board = createBoard(COLS, ROWS)
+            score = 0
+            spawnPiece()
+        }
         updateScore()
-        spawnPiece()
-        isPaused = false
-        particles = []
 
         if (gameLoop) cancelAnimationFrame(gameLoop)
         lastTime = 0
@@ -347,6 +405,7 @@ document.addEventListener('DOMContentLoaded', () => {
         dropCounter = 0
         score += 1 // Increment score for each piece moved down
         updateScore()
+        saveGameState()
     }
 
     function hardDrop() {
@@ -358,6 +417,7 @@ document.addEventListener('DOMContentLoaded', () => {
         lockPiece()
         spawnPiece()
         updateScore()
+        saveGameState()
     }
 
     function movePieceLeft() {
@@ -365,6 +425,7 @@ document.addEventListener('DOMContentLoaded', () => {
         if (checkCollision(currentPiece)) {
             currentPiece.x++
         }
+        saveGameState()
     }
 
     function movePieceRight() {
@@ -372,6 +433,7 @@ document.addEventListener('DOMContentLoaded', () => {
         if (checkCollision(currentPiece)) {
             currentPiece.x--
         }
+        saveGameState()
     }
 
     function rotatePiece() {
@@ -390,6 +452,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 return
             }
         }
+        saveGameState()
     }
 
     function checkCollision(piece) {
@@ -417,6 +480,7 @@ document.addEventListener('DOMContentLoaded', () => {
             })
         })
         clearLines()
+        saveGameState()
     }
 
     function clearLines() {
@@ -434,6 +498,7 @@ document.addEventListener('DOMContentLoaded', () => {
         if (linesCleared > 0) {
             score += linesCleared * 10 * linesCleared
             updateScore()
+            saveGameState()
         }
     }
 
@@ -452,6 +517,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
     function gameOver() {
         updateScore()
+        clearGameState()
         if (gameAreaDiv.classList.contains('hidden')) return // 防止多次触发
         cancelAnimationFrame(gameLoop)
         alert(`Game Over! Your score: ${score}`)
@@ -570,4 +636,18 @@ document.addEventListener('DOMContentLoaded', () => {
     rotateBtn.addEventListener('click', () => { if (!isPaused && currentPiece) rotatePiece() })
     // speedDropBtn.addEventListener('click', function(e) { if (!isPaused && currentPiece) hardDrop() })
     // pauseBtn.addEventListener('click', function(e) { togglePause() })
+
+    // 页面加载时自动恢复
+    if (localStorage.getItem(STORAGE_KEY)) {
+        // 自动填充宽高
+        try {
+            const state = JSON.parse(localStorage.getItem(STORAGE_KEY))
+            if (state.COLS && state.ROWS) {
+                widthInput.value = state.COLS
+                heightInput.value = state.ROWS
+            }
+        } catch { }
+        // 自动开始
+        startGame()
+    }
 })
