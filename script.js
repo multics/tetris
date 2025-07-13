@@ -56,6 +56,7 @@ document.addEventListener('DOMContentLoaded', () => {
     let particles = []
     let isSpeedDrop = false
     let dropIntervalBackup = dropInterval // Backup for speedy drop
+    let isGameOver = false // 新增
 
     // --- Save/Load State ---
     function saveGameState() {
@@ -70,7 +71,8 @@ document.addEventListener('DOMContentLoaded', () => {
                 color: currentPiece.color
             },
             COLS,
-            ROWS
+            ROWS,
+            isGameOver // 新增
         }
         localStorage.setItem(STORAGE_KEY, JSON.stringify(state))
     }
@@ -80,11 +82,12 @@ document.addEventListener('DOMContentLoaded', () => {
         if (!data) return false
         try {
             const state = JSON.parse(data)
-            if (!state.board || !state.currentPiece) return false
+            if (!state.board || !state.currentPiece || state.isGameOver) return false
             COLS = state.COLS
             ROWS = state.ROWS
             board = state.board
             score = state.score
+            isGameOver = !!state.isGameOver // 新增
             // 恢复currentPiece
             const shape = SHAPES[state.currentPiece.shapeIndex]
             const color = state.currentPiece.color
@@ -100,6 +103,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
     function clearGameState() {
         localStorage.removeItem(STORAGE_KEY)
+        console.log('clearGameState')
     }
 
     function getShapeIndex(shape) {
@@ -153,22 +157,17 @@ document.addEventListener('DOMContentLoaded', () => {
     // --- Game Setup ---
     function startGame() {
         if (!setDimensions()) return
-
-        // 检查是否有存档，有则恢复
+        isGameOver = false // 无条件重置，确保新游戏
         if (!loadGameState()) {
             board = createBoard(COLS, ROWS)
             score = 0
-            spawnPiece()
+            spawnPiece();
         }
-
         updateScore()
-        if (gameLoop) cancelAnimationFrame(gameLoop)
-        lastTime = 0
-        dropCounter = 0
+        draw()
         gameLoop = requestAnimationFrame(update)
-
         settingsDiv.classList.add('hidden')
-        gameAreaDiv.classList.remove('hidden')
+        gameAreaDiv.classList.remove('hidden');
     }
 
     function setDimensions() {
@@ -217,8 +216,8 @@ document.addEventListener('DOMContentLoaded', () => {
 
     // --- Game Loop ---
     function update(time = 0) {
-        if (isPaused) {
-            return // Stop the loop if paused
+        if (isPaused || isGameOver) {
+            return // 停止动画循环
         }
 
         const deltaTime = time - lastTime
@@ -232,6 +231,7 @@ document.addEventListener('DOMContentLoaded', () => {
         handleParticles()
         draw()
         gameLoop = requestAnimationFrame(update)
+        console.log(gameLoop)
     }
 
     // --- Drawing ---
@@ -516,7 +516,9 @@ document.addEventListener('DOMContentLoaded', () => {
 
     function gameOver() {
         updateScore()
+        isGameOver = true // 新增
         clearGameState()
+        console.log('gameOver')
         cancelAnimationFrame(gameLoop)
         if (gameAreaDiv.classList.contains('hidden')) return // 防止多次触发
         alert(`Game Over! Your score: ${score}`)
@@ -637,16 +639,14 @@ document.addEventListener('DOMContentLoaded', () => {
     // pauseBtn.addEventListener('click', function(e) { togglePause() })
 
     // 页面加载时自动恢复
-    if (localStorage.getItem(STORAGE_KEY)) {
-        // 自动填充宽高
+    if (loadGameState()) {
         try {
             const state = JSON.parse(localStorage.getItem(STORAGE_KEY))
-            if (state.COLS && state.ROWS) {
+            if (state.COLS && state.ROWS && !state.isGameOver) { // 只在未结束时自动恢复
                 widthInput.value = state.COLS
                 heightInput.value = state.ROWS
+                startGame()
             }
         } catch { }
-        // 自动开始
-        startGame()
     }
 })
