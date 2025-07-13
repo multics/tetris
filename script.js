@@ -72,11 +72,11 @@ document.addEventListener('DOMContentLoaded', () => {
             COLS,
             ROWS
         }
-        localStorage.setItem('tetris_save_v1', JSON.stringify(state))
+        localStorage.setItem(STORAGE_KEY, JSON.stringify(state))
     }
 
     function loadGameState() {
-        const data = localStorage.getItem('tetris_save_v1')
+        const data = localStorage.getItem(STORAGE_KEY)
         if (!data) return false
         try {
             const state = JSON.parse(data)
@@ -99,7 +99,7 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     function clearGameState() {
-        localStorage.removeItem('tetris_save_v1')
+        localStorage.removeItem(STORAGE_KEY)
     }
 
     function getShapeIndex(shape) {
@@ -155,14 +155,13 @@ document.addEventListener('DOMContentLoaded', () => {
         if (!setDimensions()) return
 
         // 检查是否有存档，有则恢复
-        if (loadGameState()) {
-        } else {
+        if (!loadGameState()) {
             board = createBoard(COLS, ROWS)
             score = 0
             spawnPiece()
         }
-        updateScore()
 
+        updateScore()
         if (gameLoop) cancelAnimationFrame(gameLoop)
         lastTime = 0
         dropCounter = 0
@@ -518,8 +517,8 @@ document.addEventListener('DOMContentLoaded', () => {
     function gameOver() {
         updateScore()
         clearGameState()
-        if (gameAreaDiv.classList.contains('hidden')) return // 防止多次触发
         cancelAnimationFrame(gameLoop)
+        if (gameAreaDiv.classList.contains('hidden')) return // 防止多次触发
         alert(`Game Over! Your score: ${score}`)
         gameAreaDiv.classList.add('hidden')
         settingsDiv.classList.remove('hidden')
