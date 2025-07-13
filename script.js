@@ -411,13 +411,13 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     function hardDrop() {
+        // 先模拟下落，直到碰撞
         while (!checkCollision(currentPiece)) {
             currentPiece.y++
-            score += 1
         }
         currentPiece.y--
-        lockPiece()
-        spawnPiece()
+        // 否则落到底
+        // 不锁定，不spawn新方块
         updateScore()
         saveGameState()
     }
