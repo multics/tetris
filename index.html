@@ -25,10 +25,16 @@
         </div>
 
         <div id="game-area" class="hidden">
-            <p>Score:&nbsp;<span id="score">0</span></p>
-
-            <canvas id="tetris-canvas"></canvas>
-
+            <div class="game-board-container">
+                <canvas id="tetris-canvas"></canvas>
+                <div class="side-panel">
+                    <p>Score:&nbsp;<span id="score">0</span></p>
+                    <div class="preview-container">
+                        <p data-i18n="next">Next</p>
+                        <canvas id="preview-canvas"></canvas>
+                    </div>
+                </div>
+            </div>
 
             <div id="mobile-controls" class="mobile-controls-container">
                 <button id="left-btn">◀</button>

@@ -3,6 +3,8 @@ document.addEventListener('DOMContentLoaded', () => {
     // --- DOM Elements ---
     const canvas = document.getElementById('tetris-canvas')
     const context = canvas.getContext('2d')
+    const previewCanvas = document.getElementById('preview-canvas')
+    const previewContext = previewCanvas.getContext('2d')
     const scoreElement = document.getElementById('score')
     const startButton = document.getElementById('start-button')
     const settingsDiv = document.getElementById('settings')
@@ -47,6 +49,7 @@ document.addEventListener('DOMContentLoaded', () => {
     let board
     let score = 0
     let currentPiece
+    let nextPiece
     let gameLoop
     let COLS, ROWS
     let lastTime = 0
@@ -60,7 +63,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
     // --- Save/Load State ---
     function saveGameState() {
-        if (!board || !currentPiece) return
+        if (!board || !currentPiece || !nextPiece) return
         const state = {
             board,
             score,
@@ -69,6 +72,10 @@ document.addEventListener('DOMContentLoaded', () => {
                 x: currentPiece.x,
                 y: currentPiece.y,
                 color: currentPiece.color
+            },
+            nextPiece: {
+                shapeIndex: getShapeIndex(nextPiece.shape),
+                color: nextPiece.color
             },
             COLS,
             ROWS,
@@ -83,7 +90,7 @@ document.addEventListener('DOMContentLoaded', () => {
         if (!data) return false
         try {
             const state = JSON.parse(data)
-            if (!state.board || !state.currentPiece || state.isGameOver) return false
+            if (!state.board || !state.currentPiece || !state.nextPiece || state.isGameOver) return false
             COLS = state.COLS
             ROWS = state.ROWS
             board = state.board
@@ -91,11 +98,16 @@ document.addEventListener('DOMContentLoaded', () => {
             isPaused = !!state.isPaused
             isGameOver = !!state.isGameOver // 新增
             // 恢复currentPiece
-            const shape = SHAPES[state.currentPiece.shapeIndex]
-            const color = state.currentPiece.color
+            let shape = SHAPES[state.currentPiece.shapeIndex]
+            let color = state.currentPiece.color
             currentPiece = new Piece(shape, color)
             currentPiece.x = state.currentPiece.x
             currentPiece.y = state.currentPiece.y
+            // 恢复nextPiece
+            shape = SHAPES[state.nextPiece.shapeIndex]
+            color = state.nextPiece.color
+            nextPiece = new Piece(shape, color)
+
             updateScore()
             return true
         } catch {
@@ -151,7 +163,7 @@ document.addEventListener('DOMContentLoaded', () => {
         constructor(shape, color) {
             this.shape = shape
             this.color = color
-            this.x = Math.floor(COLS / 2) - Math.floor(this.shape[0].length / 2)
+            this.x = 0
             this.y = 0
         }
     }
@@ -163,6 +175,7 @@ document.addEventListener('DOMContentLoaded', () => {
         if (!loadGameState()) {
             board = createBoard(COLS, ROWS)
             score = 0
+            nextPiece = createNewPiece()
             spawnPiece()
         }
         updateScore()
@@ -205,15 +218,23 @@ document.addEventListener('DOMContentLoaded', () => {
         return Array.from({ length: height }, () => Array(width).fill(0))
     }
 
-    function spawnPiece() {
+    function createNewPiece() {
         const shapeIndex = Math.floor(Math.random() * SHAPES.length)
         const shape = SHAPES[shapeIndex]
         const color = COLORS[shapeIndex + 1]
-        currentPiece = new Piece(shape, color)
+        return new Piece(shape, color)
+    }
+
+    function spawnPiece() {
+        currentPiece = nextPiece
+        currentPiece.x = Math.floor(COLS / 2) - Math.floor(currentPiece.shape[0].length / 2)
+        currentPiece.y = 0
+        nextPiece = createNewPiece()
 
         if (checkCollision(currentPiece)) {
             gameOver()
         }
+        drawPreview()
     }
 
     // --- Game Loop ---
@@ -249,6 +270,37 @@ document.addEventListener('DOMContentLoaded', () => {
         if (isPaused) {
             drawPauseScreen()
         }
+    }
+
+    function drawPreview() {
+        const PREVIEW_BLOCK_SIZE = 20
+        previewCanvas.width = 4 * PREVIEW_BLOCK_SIZE
+        previewCanvas.height = 4 * PREVIEW_BLOCK_SIZE
+        previewContext.clearRect(0, 0, previewCanvas.width, previewCanvas.height)
+
+        if (!nextPiece) return
+
+        const shape = nextPiece.shape
+        const color = nextPiece.color
+        const shapeWidth = shape[0].length
+        const shapeHeight = shape.length
+
+        const startX = (previewCanvas.width - shapeWidth * PREVIEW_BLOCK_SIZE) / 2
+        const startY = (previewCanvas.height - shapeHeight * PREVIEW_BLOCK_SIZE) / 2
+
+        shape.forEach((row, y) => {
+            row.forEach((value, x) => {
+                if (value) {
+                    draw3DBlock(
+                        previewContext,
+                        startX + x * PREVIEW_BLOCK_SIZE,
+                        startY + y * PREVIEW_BLOCK_SIZE,
+                        PREVIEW_BLOCK_SIZE,
+                        color
+                    )
+                }
+            })
+        })
     }
 
     // 立体方块绘制函数

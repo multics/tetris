@@ -1,123 +1,170 @@
 /* General Styling */
 body {
-    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen,
-        Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif;
-    background-color: #121212;
-    color: #e0e0e0;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    height: 100vh;
-    margin: 0;
-    touch-action: manipulation; /* Prevents double-tap zoom on mobile */
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Oxygen,
+    Ubuntu, Cantarell, "Open Sans", "Helvetica Neue", sans-serif;
+  background-color: #121212;
+  color: #e0e0e0;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 100vh;
+  margin: 0;
+  touch-action: manipulation;
+  /* Prevents double-tap zoom on mobile */
 }
 
 .game-container {
-    text-align: center;
-    background-color: #1e1e1e;
-    padding: 20px;
-    border-radius: 10px;
-    box-shadow: 0 0 20px rgba(0, 0, 0, 0.5);
+  text-align: center;
+  background-color: #1e1e1e;
+  padding: 20px;
+  border-radius: 10px;
+  box-shadow: 0 0 20px rgba(0, 0, 0, 0.5);
 }
 
 h1 {
-    color: #bb86fc;
+  color: #bb86fc;
 }
 
 /* Settings Area */
 .settings-container {
-    margin-bottom: 20px;
+  margin-bottom: 20px;
 }
 
 .input-group {
-    margin: 10px 0;
+  margin: 10px 0;
 }
 
 .input-group label {
-    margin-right: 10px;
+  margin-right: 10px;
 }
 
 input[type="number"] {
-    width: 60px;
-    padding: 5px;
-    background-color: #333;
-    color: #e0e0e0;
-    border: 1px solid #444;
-    border-radius: 5px;
+  width: 60px;
+  padding: 5px;
+  background-color: #333;
+  color: #e0e0e0;
+  border: 1px solid #444;
+  border-radius: 5px;
 }
 
 button {
-    padding: 10px 20px;
-    font-size: 1em;
-    cursor: pointer;
-    border: none;
-    border-radius: 5px;
-    background-color: #03dac6;
-    color: #000;
-    transition: background-color 0.3s ease;
+  padding: 10px 20px;
+  font-size: 1em;
+  cursor: pointer;
+  border: none;
+  border-radius: 5px;
+  background-color: #03dac6;
+  color: #000;
+  transition: background-color 0.3s ease;
 }
 
 button:hover {
-    background-color: #018786;
+  background-color: #018786;
 }
 
 /* Game Area */
 #game-area {
-    margin: 0 auto;
+  margin: 0 auto;
 }
 
+.game-board-container {
+  display: flex;
+  align-items: flex-start;
+  /* Align items to the top */
+  gap: 10px;
+  /* Space between board and side panel */
+}
+
+.side-panel {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 5px;
+}
+
+.preview-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  background-color: #000;
+  padding: 10px;
+  border-radius: 5px;
+  border: 2px solid #bb86fc;
+}
+
+#preview-canvas {
+  background-color: #000;
+  border-radius: 5px;
+  width: 30vw;
+}
 canvas {
-    background-color: #000;
-    border: 2px solid #bb86fc;
-    border-radius: 5px;
-    max-width: 100%; /* Ensure canvas scales down on small screens */
-    max-height: 70vh; /* Prevent canvas from being too tall */
-    display: block; /* Removes extra space below canvas */
-    margin: 10px auto;
+  background-color: #000;
+  border: 2px solid #bb86fc;
+  border-radius: 5px;
+  max-width: 100%;
+  max-height: 70vh;
+  display: block;
+  margin: 0;
 }
 
 .hidden {
-    display: none;
+  display: none;
 }
 
-/* Mobile Controls */
 .mobile-controls-container {
-    display: none; /* Hidden by default */
-    margin-top: 20px;
+  display: none;
+  margin-top: 20px;
 }
 
 .mobile-controls-container button {
-    width: 60px;
-    height: 60px;
-    font-size: 2em;
-    margin: 0 10px;
-    background-color: #373737;
-    color: #e0e0e0;
+  width: 60px;
+  height: 60px;
+  font-size: 2em;
+  margin: 0 10px;
+  background-color: #373737;
+  color: #e0e0e0;
 }
 
 .controls-info {
-    margin-top: 15px;
-    color: #888;
+  margin-top: 15px;
+  color: #888;
 }
 
 .version-info {
-    font-size: 0.8em;
-    color: #333;
-    margin-top: 10px;
+  font-size: 0.8em;
+  color: #333;
+  margin-top: 10px;
 }
-/* Responsive Design */
+
 @media (max-width: 768px) {
-    .game-container {
-        padding: 10px;
-    }
+  .game-container {
+    padding: 10px;
+  }
 
-    .controls-info {
-        display: none; /* Hide desktop controls info on mobile */
-    }
+  .game-board-container {
+    flex-direction: column;
+    align-items: center;
+  }
 
-    .mobile-controls-container {
-        display: block; /* Show mobile controls */
-    }
+  .side-panel {
+    flex-direction: row;
+    justify-content: space-around;
+    width: 100%;
+    align-items: center;
+  }
+
+  .preview-container {
+    flex-direction: row;
+    align-items: center;
+    gap: 15px;
+  }
+  .controls-info {
+    display: none;
+  }
+
+  .mobile-controls-container {
+    display: block;
+  }
 }
 
 /* User Select None */
@@ -131,33 +178,29 @@ canvas,
 .settings-container,
 .input-group,
 .mobile-controls-container {
-    user-select: none;
-    -webkit-user-select: none;
-    -ms-user-select: none;
-    -moz-user-select: none;
+  user-select: none;
+  -webkit-user-select: none;
+  -ms-user-select: none;
+  -moz-user-select: none;
 }
 
 #start-button {
-    background: linear-gradient(180deg, #fffbe6 0%, #ffe082 40%, #ffb300 100%);
-    color: #7c4d00;
-    font-weight: bold;
-    box-shadow:
-        0 2px 8px rgba(255, 193, 7, 0.25),
-        0 1.5px 0 #fffbe6 inset,
-        0 -2px 0 #ffb300 inset;
-    border: 1.5px solid #ffb300;
-    border-radius: 8px;
-    text-shadow: 0 1px 0 #fffbe6, 0 -1px 0 #ffb300;
-    transition: box-shadow 0.2s, transform 0.1s;
-    outline: none;
+  background: linear-gradient(180deg, #fffbe6 0%, #ffe082 40%, #ffb300 100%);
+  color: #7c4d00;
+  font-weight: bold;
+  box-shadow: 0 2px 8px rgba(255, 193, 7, 0.25), 0 1.5px 0 #fffbe6 inset,
+    0 -2px 0 #ffb300 inset;
+  border: 1.5px solid #ffb300;
+  border-radius: 8px;
+  text-shadow: 0 1px 0 #fffbe6, 0 -1px 0 #ffb300;
+  transition: box-shadow 0.2s, transform 0.1s;
+  outline: none;
 }
 
 #start-button:hover,
 #start-button:focus {
-    background: linear-gradient(180deg, #fffde7 0%, #ffe082 60%, #ffa000 100%);
-    box-shadow:
-        0 4px 16px rgba(255, 193, 7, 0.35),
-        0 2px 0 #fffbe6 inset,
-        0 -3px 0 #ffa000 inset;
-    transform: translateY(-2px) scale(1.04);
+  background: linear-gradient(180deg, #fffde7 0%, #ffe082 60%, #ffa000 100%);
+  box-shadow: 0 4px 16px rgba(255, 193, 7, 0.35), 0 2px 0 #fffbe6 inset,
+    0 -3px 0 #ffa000 inset;
+  transform: translateY(-2px) scale(1.04);
 }
